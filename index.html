@@ -15,7 +15,11 @@
             <label for="newTodo">Create a new todo item with this form:</label>
             <input type="text" class="form-control" id="newTodoTitle" placeholder="Enter new todo item title">
             <input type="text" class="form-control" id="newTodoDesc" placeholder="Enter new todo item description">
-            <input type="date" class="form-control" id="newTodoDueDate" placeholder="Enter new todo item due date">
+            <input type="date" class="form-control" id="newTodoDueDate" title="Enter new todo item due date">
+            <select class="form-control" id="newTodoComplete" title="Enter new todo item due date">
+                <option value="true">True</option>
+                <option value="false">False</option>
+            </select>
           </div>
           <button type="submit" class="btn btn-primary">Add Todo</button>
         </form>
@@ -36,9 +40,22 @@
     integrity="sha384-48ZUMEuD7b/cSLXbOzjkAdMmwQofQRuCwEiKuCtgJs0sOTsZKSq3ThB0XQ2hpDzP"
     crossorigin="anonymous"></script>
   <script>
+    ///\\\\\\\\\\\\\\\\////////////\\\\\\\\\\\\\\\\///////////
     $(function() {
+      // fetch the todo list API
+      async function fetchData() {
+        try {
+          var response = await fetch('/api/todoList');
+          var data = await response.json();
+          var jsonVariable = data;
+          console.log(jsonVariable);
+          return jsonVariable
+        } catch (err) {
+          throw(err);
+        }
+      };
       // create todo list array
-      var todoItems = [];
+      var todoItems = fetchData();
       // Add todo item
       $('form').submit(function(e) {
         e.preventDefault();
@@ -46,20 +63,22 @@
             title: $('#newTodoTitle').val(),
             desc: $('#newTodoDesc').val(),
             dueDate: $('#newTodoDueDate').val(),
+            complete: $('#newTodoComplete').val(),
         };
         if (newTodo.title !== "" && newTodo.desc !== "" && newTodo.dueDate !== "") {
           if (newTodo in todoItems) {
             alert("That todo item already exists. How about editing or deleting it?");
           }
           else {
-            todoItems.push(newTodo)
-            $('#todoList').append(`<li class="list-group-item">
-                <h2>${newTodo.title}</h2>
-                <p>${newTodo.desc}</p>
-                <p><b>Due Date</b>: ${newTodo.dueDate}</p>
-                <button class="btn btn-outline-success">Edit</button>
-                <button class="btn btn-outline-danger">Delete</button>
-            </li>`);
+            // todoItems.push(newTodo)
+            fetch(`/api/todoListCtrl/?role=add&title=${newTodo.title}&desc=${newTodo.desc}&due-date=${newTodo.dueDate}&completed=${newTodo.completed}`)
+              .then(response => response.json())
+              .then(data => {
+                var jsonVariable = data;
+                console.log(jsonVariable);
+              })
+              .catch(error => {throw(error)})
+            ;
             $('#newTodoTitle').val('');
             $('#newTodoDesc').val('');
             $('#newTodoDueDate').val('');

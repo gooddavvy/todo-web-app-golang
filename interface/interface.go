@@ -10,3 +10,8 @@ type TodoItem struct {
 	DueDate   string `json:"due_date"`
 	Completed bool   `json:"completed"`
 }
+
+type CtrlMessage struct {
+	Message string `json:"message"`
+	Type    string `json:"type"`
+}
